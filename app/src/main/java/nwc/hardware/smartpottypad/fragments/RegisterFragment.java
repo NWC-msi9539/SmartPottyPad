@@ -1,4 +1,4 @@
-package nwc.hardware.smartpottypad.activities;
+package nwc.hardware.smartpottypad.fragments;
 
 import android.animation.Animator;
 import android.animation.FloatEvaluator;
@@ -13,7 +13,9 @@ import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -24,18 +26,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import nwc.hardware.smartpottypad.R;
+import nwc.hardware.smartpottypad.activities.IntroActivity;
 import nwc.hardware.smartpottypad.datas.Display;
+import nwc.hardware.smartpottypad.listeners.OnBackKeyDownListener;
 
-public class RegisterActivity extends AppCompatActivity {
-    private final String TAG = "RegisterActivity";
+public class RegisterFragment extends Fragment {
+    private final String TAG = "registerFragment";
+
+    private IntroActivity parent;
 
     private float startValue = -24f;
     private float endValue= 24f;
-
-    private int tictoc = 0;
 
     private ImageView fadeTool;
     private ImageView loadingIMG;
@@ -99,22 +103,35 @@ public class RegisterActivity extends AppCompatActivity {
 
     private int step = 0;
 
+    public RegisterFragment(IntroActivity activity){
+        parent = activity;
+
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_register, container, false);
 
-        imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        EditBACK = getDrawable(com.google.android.gms.base.R.drawable.common_google_signin_btn_icon_dark_normal_background);
+        parent.setOnKeyDownListener(new OnBackKeyDownListener() {
+            @Override
+            public void onBackKeyDown() {
+                preStepDraw();
+            }
+        });
 
-        RegLayout = findViewById(R.id.RegLayout);
-        fadeTool = findViewById(R.id.Reg_fadeTool);
-        stepInfo = findViewById(R.id.stepInfoTXT);
-        statusTXT = findViewById(R.id.Reg_statusTXT);
-        loadingIMG = findViewById(R.id.Reg_loadingIMG);
+        imm = (InputMethodManager) getContext().getSystemService(getContext().INPUT_METHOD_SERVICE);
+        EditBACK = getContext().getDrawable(com.google.android.gms.base.R.drawable.common_google_signin_btn_icon_dark_normal_background);
+
+        RegLayout = v.findViewById(R.id.RegLayout);
+        fadeTool = v.findViewById(R.id.Reg_fadeTool);
+        stepInfo = v.findViewById(R.id.stepInfoTXT);
+        statusTXT = v.findViewById(R.id.Reg_statusTXT);
+        loadingIMG = v.findViewById(R.id.Reg_loadingIMG);
         loadingIMG.setTranslationY(-1 * Display.height_Float / 8f);
 
-        IDTXT = findViewById(R.id.Reg_idEDIT);
+        IDTXT = v.findViewById(R.id.Reg_idEDIT);
         IDTXT.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -124,14 +141,19 @@ public class RegisterActivity extends AppCompatActivity {
                 return false;
             }
         });
-        PassTXT = findViewById(R.id.Reg_passEDIT);
+        IDTXT.setCursorVisible(false);
+
+        PassTXT = v.findViewById(R.id.Reg_passEDIT);
         PassTXT.addTextChangedListener(passWatcher);
         PassTXT.setOnKeyListener(passListener);
+        PassTXT.setCursorVisible(false);
 
-        PassCheckTXT = findViewById(R.id.Reg_passcheckEDIT);
+        PassCheckTXT = v.findViewById(R.id.Reg_passcheckEDIT);
         PassCheckTXT.addTextChangedListener(passWatcher);
         PassCheckTXT.setOnKeyListener(passListener);
-        stepBTN = findViewById(R.id.nextStepBTN);
+        PassCheckTXT.setCursorVisible(false);
+
+        stepBTN = v.findViewById(R.id.nextStepBTN);
 
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
@@ -183,11 +205,16 @@ public class RegisterActivity extends AppCompatActivity {
                 nextStepDraw();
             }
         });
+
+        return v;
     }
+
 
     /**
      * step 0 - ID 입력
      * step 1 - PIN 입력
+     * step 2 - PIN 확인
+     * step 3 - ID등록
      */
     public void nextStepDraw(){
         switch (step){
@@ -199,6 +226,22 @@ public class RegisterActivity extends AppCompatActivity {
                         .setInterpolator(new AccelerateInterpolator())
                         .setDuration(1000)
                         .translationX(0f)
+                        .withStartAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                stepBTN.animate()
+                                        .setInterpolator(new AccelerateInterpolator())
+                                        .setDuration(1000)
+                                        .alpha(0f)
+                                        .withEndAction(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                stepBTN.setEnabled(false);
+                                            }
+                                        })
+                                        .start();
+                            }
+                        })
                         .withEndAction(new Runnable() {
                             @Override
                             public void run() {
@@ -264,7 +307,7 @@ public class RegisterActivity extends AppCompatActivity {
                                                                 animator.addListener(new Animator.AnimatorListener() {
                                                                     @Override
                                                                     public void onAnimationStart(Animator animation) {
-                                                                        
+
                                                                     }
 
                                                                     @Override
@@ -287,7 +330,9 @@ public class RegisterActivity extends AppCompatActivity {
                                                                     public void onAnimationUpdate(ValueAnimator animation) {
                                                                         Float fraction = animation.getAnimatedFraction();
                                                                         float value = evaluator.evaluate(fraction, startValue, endValue);
+                                                                        float alpha_value = evaluator.evaluate(fraction, 1f, 0f);
                                                                         loadingIMG.setRotationX(value);
+                                                                        statusTXT.setAlpha(alpha_value);
                                                                     }
                                                                 });
                                                                 animator.start();
@@ -319,6 +364,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void preStepDraw(){
         switch (step){
+            case 0:
+                parent.changeFragment(IntroActivity.FRAGMENT_INTRO);
+                break;
             case 1:
                 step = 0;
                 IDTXT.setBackground(emptyBACK);
@@ -326,6 +374,19 @@ public class RegisterActivity extends AppCompatActivity {
                 IDTXT.requestFocus();
                 stepInfo.setText("사용하실 ID를 적어주세요!\n(한글, 영어, 숫자만 가능해요!)");
                 PassTXT.setVisibility(View.GONE);
+                PassTXT.setText("");
+                stepBTN.animate()
+                        .setInterpolator(new DecelerateInterpolator())
+                        .setDuration(1000)
+                        .alpha(1f)
+                        .withStartAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                stepBTN.setEnabled(true);
+                                stepBTN.setAlpha(0f);
+                            }
+                        })
+                        .start();
                 imm.showSoftInput(IDTXT, 0);
                 break;
             case 2:
@@ -335,10 +396,15 @@ public class RegisterActivity extends AppCompatActivity {
                 PassTXT.requestFocus();
                 stepInfo.setText("사용하실 PIN번호를 적어주세요!\n(6자리 숫자에요!)");
                 PassCheckTXT.setVisibility(View.GONE);
+                PassCheckTXT.setText("");
                 imm.showSoftInput(PassTXT, 0);
+                break;
+            case 3:
                 break;
             default:
                 break;
         }
     }
+
+
 }
