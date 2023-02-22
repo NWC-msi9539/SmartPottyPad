@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "841675782918",
+    "project_id": "smartpottypad",
+    "storage_bucket": "smartpottypad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:841675782918:android:3012f01b796a5c4c057c87",
+        "android_client_info": {
+          "package_name": "nwc.hardware.smartpottypad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "841675782918-iq3d6nbae5gjevvs0992ngnepn5bmgp9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "nwc.hardware.smartpottypad",
+            "certificate_hash": "7c23a280fad5a371fcabe62e83fa1be7720f1c62"
+          }
+        },
+        {
+          "client_id": "841675782918-dmi9u9veig6dt49o78v0a5dq71mslq1o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2TNxIHZexC-Di4PjiV6_eap3nosIv5eA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "841675782918-dmi9u9veig6dt49o78v0a5dq71mslq1o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
