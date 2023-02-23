@@ -10,7 +10,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -28,8 +31,11 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import java.util.regex.Pattern;
+
 import nwc.hardware.smartpottypad.R;
 import nwc.hardware.smartpottypad.activities.IntroActivity;
+import nwc.hardware.smartpottypad.animator.ErrorAnimator;
 import nwc.hardware.smartpottypad.datas.Display;
 import nwc.hardware.smartpottypad.listeners.OnBackKeyDownListener;
 
@@ -101,6 +107,19 @@ public class RegisterFragment extends Fragment {
         }
     };
 
+    protected InputFilter inputBodyFilter = new InputFilter() {
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            Pattern ps = Pattern.compile("^[0-9a-zA-Z]+$");
+            if(!ps.matcher(source).matches()){
+                return "";
+            }
+            return null;
+        }
+    };
+
+    private InputFilter[] filters = { inputBodyFilter };
+
     private int step = 0;
 
     public RegisterFragment(IntroActivity activity){
@@ -141,6 +160,7 @@ public class RegisterFragment extends Fragment {
                 return false;
             }
         });
+        IDTXT.setFilters(filters);
         IDTXT.setCursorVisible(false);
 
         PassTXT = v.findViewById(R.id.Reg_passEDIT);
@@ -174,7 +194,7 @@ public class RegisterFragment extends Fragment {
                                         .withEndAction(new Runnable() {
                                             @Override
                                             public void run() {
-                                                stepInfo.setText("사용하실 ID를 적어주세요!\n(한글, 영어, 숫자만 가능해요!)");
+                                                stepInfo.setText("사용하실 ID를 적어주세요!\n(영어, 숫자 혼용 16자 제한)");
                                                 fadeTool.animate()
                                                         .setInterpolator(new AccelerateInterpolator())
                                                         .setStartDelay(0)
@@ -202,6 +222,13 @@ public class RegisterFragment extends Fragment {
         stepBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(IDTXT.getText().toString().isEmpty()){
+                    ErrorAnimator errorAnimator = new ErrorAnimator(IDTXT);
+                    Vibrator vibrator = (Vibrator) getContext().getSystemService(getContext().VIBRATOR_SERVICE);
+                    vibrator.vibrate(500);
+                    errorAnimator.start();
+                    return;
+                }
                 nextStepDraw();
             }
         });
@@ -372,7 +399,7 @@ public class RegisterFragment extends Fragment {
                 IDTXT.setBackground(emptyBACK);
                 IDTXT.setEnabled(true);
                 IDTXT.requestFocus();
-                stepInfo.setText("사용하실 ID를 적어주세요!\n(한글, 영어, 숫자만 가능해요!)");
+                stepInfo.setText("사용하실 ID를 적어주세요!\n(영어, 숫자 혼용 16자 제한)");
                 PassTXT.setVisibility(View.GONE);
                 PassTXT.setText("");
                 stepBTN.animate()
@@ -405,6 +432,5 @@ public class RegisterFragment extends Fragment {
                 break;
         }
     }
-
 
 }
