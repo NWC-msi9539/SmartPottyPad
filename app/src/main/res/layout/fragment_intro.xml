@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.IntroFragment">
+    tools:context=".fragments.intro.IntroFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -30,11 +30,12 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/notosanskr_medium"
             android:includeFontPadding="false"
+            android:textAlignment="center"
             android:textColor="#B3000000"
             app:layout_constraintBottom_toBottomOf="@+id/logoIMG"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/logoIMG"
-            app:layout_constraintVertical_bias="0.7" />
+            app:layout_constraintVertical_bias="0.9" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

@@ -4,7 +4,6 @@
         android:interpolator="@android:anim/decelerate_interpolator"
         android:fromAlpha="0.0"
         android:toAlpha="1.0"
-        android:fillAfter="true"
-        android:duration="500"
+        android:duration="1000"
         />
 </set>

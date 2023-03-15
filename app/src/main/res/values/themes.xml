@@ -13,4 +13,13 @@
         <item name="android:statusBarColor">#000000</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="Theme.SmartPottyPad.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.SmartPottyPad.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.SmartPottyPad.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

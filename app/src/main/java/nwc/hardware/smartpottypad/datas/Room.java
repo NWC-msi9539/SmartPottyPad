@@ -1,13 +1,33 @@
 package nwc.hardware.smartpottypad.datas;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Room {
     /**
      * departFloor = 소속 층
      * index = 병실 호수
-     * level = (0, 6인실) / (1, 4인실) / (2, 2인실) / (3, 1인실) / (4, 중환자실)
      */
-    private int departFloor = 0;
-    private int index = 1;
-    private int level = 0;
-    private int bedCount = 0;
+    private int index = -1;
+    private List<Bed> beds = new ArrayList<>();
+
+    public Room(int index){
+        setIndex(index);
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public List<Bed> getBeds() {
+        return beds;
+    }
+
+    public void setBeds(List<Bed> beds) {
+        this.beds = beds;
+    }
 }
