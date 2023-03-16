@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import nwc.hardware.smartpottypad.R;
 import nwc.hardware.smartpottypad.datas.User;
+import nwc.hardware.smartpottypad.datas.WifiProfile;
 import nwc.hardware.smartpottypad.fragments.home.HomeFragment;
 import nwc.hardware.smartpottypad.fragments.home.SettingFragment;
+import nwc.hardware.smartpottypad.fragments.home.detail.Home_checkWifiFragment;
 import nwc.hardware.smartpottypad.listeners.OnBackKeyDownListener;
 
 public class HomeActivity extends AppCompatActivity {
@@ -16,12 +18,16 @@ public class HomeActivity extends AppCompatActivity {
 
     public final static int FRAGMENT_SETTING= 0;
     public final static int FRAGMENT_INFO = 1;
+    public final static int FRAGMENT_DETAIL_WIFI= 2;
+
 
     private HomeFragment homeFragment;
     private SettingFragment settingFragment;
+    private Home_checkWifiFragment home_checkWifiFragment;
     private OnBackKeyDownListener onBackKeyDownListener;
 
     private User info;
+    private WifiProfile wifiProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +36,7 @@ public class HomeActivity extends AppCompatActivity {
 
         homeFragment = new HomeFragment(this);
         settingFragment = new SettingFragment(this);
+        home_checkWifiFragment = new Home_checkWifiFragment(this);
 
         changeFragment(FRAGMENT_SETTING);
     }
@@ -39,6 +46,8 @@ public class HomeActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.fade_in, R.anim.fade_out).replace(R.id.homeFrame, settingFragment).commitAllowingStateLoss();
         }else if(idx == FRAGMENT_INFO){
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.fade_in, R.anim.fade_out).replace(R.id.homeFrame, homeFragment).commitAllowingStateLoss();
+        }else if(idx == FRAGMENT_DETAIL_WIFI){
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.fade_in, R.anim.fade_out).replace(R.id.HomeDetailFrame, home_checkWifiFragment).commitAllowingStateLoss();
         }
     }
 
@@ -54,6 +63,14 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setOnKeyDownListener(OnBackKeyDownListener listener){
         this.onBackKeyDownListener = listener;
+    }
+
+    public WifiProfile getWifiProfile() {
+        return wifiProfile;
+    }
+
+    public void setWifiProfile(WifiProfile wifiProfile) {
+        this.wifiProfile = wifiProfile;
     }
 
     public void setInfo(User info){

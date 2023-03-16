@@ -1,5 +1,7 @@
 package nwc.hardware.smartpottypad.datas;
 
+import androidx.annotation.Nullable;
+
 import java.util.Calendar;
 
 import nwc.hardware.smartpottypad.R;
@@ -20,7 +22,11 @@ public class Bed {
     private long lastChangeTime = 0;
     private int pooCount = 0;
     private int changeCount = 0;
+    private float degree = 0f;
     private int alertType = TYPE_DISCONNECTION;
+    private boolean isAttach = false;
+
+    public Bed(){}
 
     public Bed(int index){
         setAlertType(Bed.TYPE_DISCONNECTION);
@@ -88,6 +94,22 @@ public class Bed {
         this.index = index;
     }
 
+    public boolean isAttach() {
+        return isAttach;
+    }
+
+    public void setAttach(boolean attach) {
+        isAttach = attach;
+    }
+
+    public float getDegree() {
+        return degree;
+    }
+
+    public void setDegree(float degree) {
+        this.degree = degree;
+    }
+
     public String getTypeToString(int type){
         String value = "";
         switch (type){
@@ -127,5 +149,24 @@ public class Bed {
                 break;
         }
         return value;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Bed bed = (Bed) obj;
+
+        return name.equals(bed.getName()) &&
+                index == bed.getIndex() &&
+                firstUseTime == bed.getFirstUseTime() &&
+                lastChangeTime == bed.getLastChangeTime() &&
+                pooCount == bed.getPooCount() &&
+                changeCount == bed.getChangeCount() &&
+                alertType == bed.getAlertType();
     }
 }

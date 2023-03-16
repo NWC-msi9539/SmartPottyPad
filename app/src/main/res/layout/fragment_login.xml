@@ -86,6 +86,17 @@
                     android:visibility="gone"
                     tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
+                <CheckBox
+                    android:id="@+id/login_autoCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/jamsil_3_regular"
+                    android:gravity="center"
+                    android:text="자동로그인"
+                    android:textAllCaps="true"
+                    android:textColor="#BF000000"
+                    android:visibility="gone" />
+
                 <Button
                     android:id="@+id/login_BTN"
                     android:layout_width="match_parent"

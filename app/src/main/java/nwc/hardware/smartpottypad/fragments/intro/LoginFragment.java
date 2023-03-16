@@ -21,6 +21,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ import nwc.hardware.smartpottypad.activities.IntroActivity;
 import nwc.hardware.smartpottypad.animator.ErrorAnimator;
 import nwc.hardware.smartpottypad.listeners.OnAnimationEndListener;
 import nwc.hardware.smartpottypad.tasks.SetPreferences;
+import nwc.hardware.smartpottypad.utils.CryptoUtil;
 
 public class LoginFragment extends Fragment {
     private final String TAG = "LoginFragment";
@@ -55,6 +57,7 @@ public class LoginFragment extends Fragment {
     private Button LoginBTN;
     private TextView stepTXT;
     private TextView infoTXT;
+    private CheckBox login_autoCheck;
 
     private int step = 0;
 
@@ -79,9 +82,11 @@ public class LoginFragment extends Fragment {
         public void afterTextChanged(Editable s) {
             if(s.toString().length() == 6){
                 stepTXT.setVisibility(View.GONE);
+                login_autoCheck.setVisibility(View.VISIBLE);
                 LoginBTN.setVisibility(View.VISIBLE);
             }else{
                 stepTXT.setVisibility(View.VISIBLE);
+                login_autoCheck.setVisibility(View.GONE);
                 LoginBTN.setVisibility(View.GONE);
             }
         }
@@ -116,6 +121,8 @@ public class LoginFragment extends Fragment {
         imm = (InputMethodManager) getContext().getSystemService(getContext().INPUT_METHOD_SERVICE);
 
         EditBACK = getContext().getDrawable(com.google.android.gms.base.R.drawable.common_google_signin_btn_text_light_normal_background);
+
+        login_autoCheck = v.findViewById(R.id.login_autoCheck);
 
         IDTXT = v.findViewById(R.id.login_IDTXT);
         IDTXT.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -227,6 +234,13 @@ public class LoginFragment extends Fragment {
                                     Map<String, String> userData = iterator.next();
                                     Log.d(TAG, "USERDATA --> ID : " + userData.get("id") + ", PIN : " + userData.get("pin"));
                                     if(userData.get("pin").equals(PIN)){
+                                        if(login_autoCheck.isChecked()){
+                                            String id = IDTXT.getText().toString();
+                                            String pass = PASSTXT.getText().toString();
+                                            String mergedText = id + " " + pass;
+
+                                            CryptoUtil.EncryptText(mergedText.getBytes());
+                                        }
                                         Intent intent = new Intent(getContext(), HomeActivity.class);
                                         startActivity(intent);
                                         parent.finish();

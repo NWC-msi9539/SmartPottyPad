@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -241,17 +242,26 @@ public class RegisterFragment extends Fragment {
 
             }
         });
-        IDTXT.setCursorVisible(false);
+        IDTXT.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_NEXT){
+                    nextStepDraw();
+                }
+                return false;
+            }
+        });
+        IDTXT.setCursorVisible(true);
 
         PassTXT = v.findViewById(R.id.Reg_passEDIT);
         PassTXT.addTextChangedListener(passWatcher);
         PassTXT.setOnKeyListener(passListener);
-        PassTXT.setCursorVisible(false);
+        PassTXT.setCursorVisible(true);
 
         PassCheckTXT = v.findViewById(R.id.Reg_passcheckEDIT);
         PassCheckTXT.addTextChangedListener(passCheckWatcher);
         PassCheckTXT.setOnKeyListener(passListener);
-        PassCheckTXT.setCursorVisible(false);
+        PassCheckTXT.setCursorVisible(true);
 
         stepBTN = v.findViewById(R.id.nextStepBTN);
 

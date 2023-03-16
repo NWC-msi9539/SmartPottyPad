@@ -1,56 +1,52 @@
 package nwc.hardware.smartpottypad.fragments.home;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import nwc.hardware.smartpottypad.R;
 import nwc.hardware.smartpottypad.activities.HomeActivity;
 import nwc.hardware.smartpottypad.adapters.HomeRoomAdapter;
+import nwc.hardware.smartpottypad.callback.SwipeToDeleteCallback;
 import nwc.hardware.smartpottypad.datas.Room;
 import nwc.hardware.smartpottypad.datas.User;
-import nwc.hardware.smartpottypad.tasks.SetPreferences;
+import nwc.hardware.smartpottypad.services.UpdateService;
 
 public class HomeFragment extends Fragment {
     private final String TAG = "HomeFragment";
 
-    private List<Room> rooms = new ArrayList<>();
+    public static List<Room> rooms = new ArrayList<>();
+    public static User info;
 
     private TextView departFloorTXT;
+    private ImageButton HomedeleteBTN;
 
     private RecyclerView roomRCC;
     private ImageButton addBTN;
     private HomeRoomAdapter adapter;
 
     private HomeActivity parent;
-    private User info;
+    private Intent intent;
+    private FrameLayout HomeDetailFrame;
 
-    private DatabaseReference infos = FirebaseDatabase.getInstance().getReference("users").child(SetPreferences.databaseKey);
-
-    private Timer timer = new Timer();
-    TimerTask timerTask = new TimerTask() {
-        @Override
-        public void run() {
-            infos.child("roomCount").setValue(info.getRoomCount());
-
-        }
-    };
+    private ItemTouchHelper itemTouchHelper;
+    private SwipeToDeleteCallback callback;
 
     public HomeFragment(HomeActivity activity){
         parent = activity;
@@ -61,10 +57,14 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_home, container, false);
+        HomeDetailFrame = v.findViewById(R.id.HomeDetailFrame);
 
+        intent = new Intent(getContext(), UpdateService.class);
         info = parent.getInfo();
+        rooms = info.getRooms();
 
-        adapter = new HomeRoomAdapter(rooms, getContext(), info.getDepartFloor());
+        Log.d(TAG, "Info Rooms Size --> " + info.getRooms().size());
+        adapter = new HomeRoomAdapter(rooms, getContext(), info.getDepartFloor(), parent);
 
         departFloorTXT = v.findViewById(R.id.departFloorTXT);
         departFloorTXT.setText(info.getDepartFloor() + "병동");
@@ -74,19 +74,72 @@ public class HomeFragment extends Fragment {
         roomRCC.setLayoutManager(new LinearLayoutManager(getContext()));
         roomRCC.setAdapter(adapter);
 
+        callback = new SwipeToDeleteCallback(adapter);
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(roomRCC);
+
+        HomedeleteBTN = v.findViewById(R.id.HomedeleteBTN);
+        HomedeleteBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!adapter.isAnim()) {
+                    addBTN.animate()
+                            .setDuration(250)
+                            .setInterpolator(new AccelerateDecelerateInterpolator())
+                            .rotation(-45f)
+                            .start();
+                    Vibrator vibrator = (Vibrator) getContext().getSystemService(getContext().VIBRATOR_SERVICE);
+                    vibrator.vibrate(250);
+                    callback.setEnabled(true);
+                    adapter.onAnim();
+                }else{
+                    addBTN.animate()
+                            .setDuration(250)
+                            .setInterpolator(new AccelerateDecelerateInterpolator())
+                            .rotation(0f)
+                            .start();
+                    Vibrator vibrator = (Vibrator) getContext().getSystemService(getContext().VIBRATOR_SERVICE);
+                    vibrator.vibrate(250);
+                    callback.setEnabled(false);
+                    adapter.offAnim();
+                }
+            }
+        });
+
         addBTN = v.findViewById(R.id.home_addRoomBTN);
         addBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                info.setRoomCount(info.getRoomCount() + 1);
-                adapter.addRoom(new Room(adapter.getItemCount() + 1));
-                Log.d(TAG, "Click adapter! Size --> " + adapter.getItemCount());
+                if(!adapter.isAnim()){
+                    Room room = new Room(adapter.getItemCount() + 1);
+                    info.setRoomCount(info.getRoomCount() + 1);
+                    Log.d(TAG, "Click adapter! Add Index --> " + (adapter.getItemCount() + 1));
+                    adapter.addRoom(room);
+                }else{
+                    addBTN.animate()
+                            .setDuration(500)
+                            .setInterpolator(new AccelerateDecelerateInterpolator())
+                            .rotation(0f)
+                            .start();
+                    Vibrator vibrator = (Vibrator) getContext().getSystemService(getContext().VIBRATOR_SERVICE);
+                    vibrator.vibrate(250);
+                    callback.setEnabled(false);
+                    adapter.offAnim();
+                }
             }
         });
 
-
-        timer.schedule(timerTask, 0, 2000);
+        parent.startService(intent);
 
         return v;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(intent != null){
+            parent.stopService(intent);
+            intent = null;
+        }
     }
 }

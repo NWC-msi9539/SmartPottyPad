@@ -40,18 +40,32 @@
 
         <TextView
             android:id="@+id/departFloorTXT"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:fontFamily="@font/jamsil_5_bold"
             android:text="1병동"
             android:textAlignment="textStart"
             android:textColor="#000000"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
+
+        <ImageButton
+            android:id="@+id/HomedeleteBTN"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@null"
+            android:scaleType="fitStart"
+            android:src="@drawable/garbage"
+            app:layout_constraintBottom_toTopOf="@+id/cardView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/departFloorTXT"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
@@ -91,7 +105,7 @@
                     android:layout_height="48dp"
                     android:layout_gravity="center"
                     android:layout_margin="16dp"
-                    app:cardBackgroundColor="#03A9F4"
+                    app:cardBackgroundColor="#64B5F6"
                     app:cardCornerRadius="30dp">
 
                     <ImageButton
@@ -99,7 +113,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        android:background="#64B5F6"
+                        android:background="@null"
                         android:padding="8dp"
                         android:scaleType="fitCenter"
                         app:srcCompat="@drawable/add"
@@ -110,4 +124,12 @@
         </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/HomeDetailFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="#FFFFFF"
+        android:visibility="gone" />
 </FrameLayout>
