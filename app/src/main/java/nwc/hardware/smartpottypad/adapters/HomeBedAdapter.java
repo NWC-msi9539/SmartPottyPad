@@ -61,31 +61,37 @@ public class HomeBedAdapter extends RecyclerView.Adapter<HomeBedAdapter.MyViewHo
         holder.BedstatusBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(HomeDetailFrame.getVisibility() == View.GONE){
-                    HomeDetailFrame.setVisibility(View.VISIBLE);
-                    HomeDetailFrame.animate()
-                                .setDuration(1500)
+                if(bed.getAlertType() == Bed.TYPE_DISCONNECTION) {
+                    if (HomeDetailFrame.getVisibility() == View.GONE) {
+                        HomeDetailFrame.setVisibility(View.VISIBLE);
+                        HomeDetailFrame.animate()
+                                .setDuration(1000)
                                 .setInterpolator(new AccelerateDecelerateInterpolator())
                                 .alpha(1f)
                                 .withEndAction(new Runnable() {
                                     @Override
                                     public void run() {
+                                        parent.getProfile().setRoomindex(String.valueOf(bed.getDepartRoom()));
+                                        parent.getProfile().setBedindex(String.valueOf(bed.getIndex() - 1));
                                         parent.changeFragment(HomeActivity.FRAGMENT_DETAIL_WIFI);
                                     }
                                 })
                                 .start();
+                    } else {
+                        HomeDetailFrame.animate()
+                                .setDuration(1000)
+                                .setInterpolator(new AccelerateDecelerateInterpolator())
+                                .alpha(0f)
+                                .withEndAction(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        HomeDetailFrame.setVisibility(View.GONE);
+                                    }
+                                })
+                                .start();
+                    }
                 }else{
-                    HomeDetailFrame.animate()
-                            .setDuration(1500)
-                            .setInterpolator(new AccelerateDecelerateInterpolator())
-                            .alpha(0f)
-                            .withEndAction(new Runnable() {
-                                @Override
-                                public void run() {
-                                    HomeDetailFrame.setVisibility(View.GONE);
-                                }
-                            })
-                            .start();
+
                 }
             }
         });

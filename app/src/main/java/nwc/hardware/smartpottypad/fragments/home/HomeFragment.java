@@ -134,6 +134,10 @@ public class HomeFragment extends Fragment {
         return v;
     }
 
+    public void repaintAdapter(){
+        adapter.notifyDataSetChanged();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();

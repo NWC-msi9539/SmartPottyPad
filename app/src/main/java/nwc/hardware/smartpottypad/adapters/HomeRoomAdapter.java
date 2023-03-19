@@ -59,7 +59,7 @@ public class HomeRoomAdapter extends RecyclerView.Adapter<HomeRoomAdapter.MyView
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "On Click addBedBTN Size --> " + room.getBeds().size());
-                room.getBeds().add(new Bed(room.getBeds().size() + 1));
+                room.getBeds().add(new Bed(room.getBeds().size() + 1, room.getIndex() - 1));
                 adapter.setBeds(room.getBeds());
             }
         });

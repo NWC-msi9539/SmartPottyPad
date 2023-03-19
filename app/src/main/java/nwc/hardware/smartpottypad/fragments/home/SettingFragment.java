@@ -27,8 +27,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.List;
+
 import nwc.hardware.smartpottypad.R;
 import nwc.hardware.smartpottypad.activities.HomeActivity;
+import nwc.hardware.smartpottypad.datas.Bed;
+import nwc.hardware.smartpottypad.datas.Room;
 import nwc.hardware.smartpottypad.datas.User;
 import nwc.hardware.smartpottypad.tasks.SetPreferences;
 
@@ -122,6 +126,22 @@ public class SettingFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 User info = task.getResult().getValue(User.class);
+                List<Room> rooms = info.getRooms();
+                int roomcnt = 0;
+                int bedcnt = 0;
+                for(Room r : rooms){
+                    List<Bed> beds = r.getBeds();
+                    for(Bed b : beds){
+                        if(b.isAttach()){
+                            parent.getProfile().setRoomindex("" + roomcnt);
+                            parent.getProfile().setBedindex("" + bedcnt);
+                            parent.addAttachReference();
+                        }
+                        bedcnt++;
+                    }
+                    bedcnt = 0;
+                    roomcnt++;
+                }
                 parent.setInfo(info);
                 if(info.getDepartFloor() == -1){
                     Handler handler = new Handler(Looper.getMainLooper());

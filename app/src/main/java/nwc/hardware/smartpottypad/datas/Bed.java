@@ -17,18 +17,19 @@ public class Bed {
      * alertType = (-1, 디바이스 미연결) , (0, 이상없음) , (1, 교체 필요) , (2, 교체 시급)
      */
     private String name = "unknown";
+    private int departRoom = -1;
     private int index = 1;
     private long firstUseTime = 0;
     private long lastChangeTime = 0;
     private int pooCount = 0;
     private int changeCount = 0;
-    private float degree = 0f;
+    private float degree = -999.9f;
     private int alertType = TYPE_DISCONNECTION;
     private boolean isAttach = false;
 
     public Bed(){}
 
-    public Bed(int index){
+    public Bed(int index, int departRoom){
         setAlertType(Bed.TYPE_DISCONNECTION);
         setChangeCount(0);
         setFirstUseTime(Calendar.getInstance().getTimeInMillis());
@@ -36,6 +37,7 @@ public class Bed {
         setIndex(index);
         setName(getIndex() + "번침대");
         setPooCount(0);
+        setDepartRoom(departRoom);
     }
 
     public String getName() {
@@ -168,5 +170,13 @@ public class Bed {
                 pooCount == bed.getPooCount() &&
                 changeCount == bed.getChangeCount() &&
                 alertType == bed.getAlertType();
+    }
+
+    public int getDepartRoom() {
+        return departRoom;
+    }
+
+    public void setDepartRoom(int departRoom) {
+        this.departRoom = departRoom;
     }
 }

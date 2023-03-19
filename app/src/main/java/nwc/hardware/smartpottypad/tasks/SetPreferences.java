@@ -1,7 +1,14 @@
 package nwc.hardware.smartpottypad.tasks;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.ArraySet;
+import android.util.Log;
+
+import java.util.Iterator;
+import java.util.Set;
 
 import nwc.hardware.smartpottypad.listeners.OnSavedEndListener;
 
@@ -14,7 +21,10 @@ public class SetPreferences {
     private boolean autoLogin;
     private String key;
     private String LoginInfo;
+    private Set<String> wifiSSID;
+    private Set<String> wifiPASS;
     private Context applicationContext;
+
 
     private OnSavedEndListener listener;
 
@@ -23,6 +33,8 @@ public class SetPreferences {
         SharedPreferences sharedPreferences = applicationContext.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE);
         autoLogin = sharedPreferences.getBoolean("autoLogin", false);
         key = sharedPreferences.getString("key", "");
+        wifiSSID = sharedPreferences.getStringSet("wifiSSID", new ArraySet<>());
+        wifiPASS = sharedPreferences.getStringSet("wifiPASS", new ArraySet<>());
         LoginInfo = sharedPreferences.getString("LoginInfo", "");
     }
 
@@ -64,9 +76,27 @@ public class SetPreferences {
         return LoginInfo;
     }
 
+    public Set<String> getWifiSSID() {
+        return wifiSSID;
+    }
+
+    public void setWifiSSID(Set<String> wifiSSID) {
+        this.wifiSSID = wifiSSID;
+    }
+
+    public Set<String> getWifiPASS() {
+        return wifiPASS;
+    }
+
+    public void setWifiPASS(Set<String> wifiPASS) {
+        this.wifiPASS = wifiPASS;
+    }
+
     public void save(){
         SharedPreferences sharedPreferences = applicationContext.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet("wifiSSID", wifiSSID);
+        editor.putStringSet("wifiPASS", wifiPASS);
         editor.putBoolean("autoLogin", autoLogin);
         editor.putString("key", key);
         editor.putString("LoginInfo", LoginInfo);
@@ -75,11 +105,21 @@ public class SetPreferences {
         if(listener != null){
             listener.onSaved();
         }
+        if(wifiSSID.size() != 0) {
+            Iterator<String> ssid_iterator = wifiSSID.iterator();
+            Iterator<String> pass_iterator = wifiPASS.iterator();
+            String ssid = ssid_iterator.next();
+            String pass = pass_iterator.next();
+            Log.d(TAG, "save! ssid --> " + ssid);
+            Log.d(TAG, "save! pass --> " + pass);
+        }
     }
 
     public void reset(){
         SharedPreferences sharedPreferences = applicationContext.getSharedPreferences(preferencesKey, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet("wifiSSID", new ArraySet<>());
+        editor.putStringSet("wifiPASS", new ArraySet<>());
         editor.putBoolean("autoLogin", false);
         editor.putString("key", "");
         editor.putString("LoginInfo", "");
@@ -92,6 +132,8 @@ public class SetPreferences {
         autoLogin = sharedPreferences.getBoolean("autoLogin", false);
         key = sharedPreferences.getString("key", "");
         LoginInfo = sharedPreferences.getString("LoginInfo", "");
+        wifiSSID = sharedPreferences.getStringSet("wifiSSID", new ArraySet<>());
+        wifiPASS = sharedPreferences.getStringSet("wifiPASS", new ArraySet<>());
     }
 
     public SetPreferences addEndTaskListener(OnSavedEndListener listener){
