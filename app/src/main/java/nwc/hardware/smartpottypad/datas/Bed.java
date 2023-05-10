@@ -1,8 +1,6 @@
 package nwc.hardware.smartpottypad.datas;
 
-import androidx.annotation.Nullable;
-
-import java.util.Calendar;
+import com.google.firebase.database.annotations.Nullable;
 
 import nwc.hardware.smartpottypad.R;
 
@@ -21,6 +19,7 @@ public class Bed {
     private int index = 1;
     private long firstUseTime = 0;
     private long lastChangeTime = 0;
+    private long enCountTime = 0;
     private int pooCount = 0;
     private int changeCount = 0;
     private float degree = -999.9f;
@@ -32,8 +31,9 @@ public class Bed {
     public Bed(int index, int departRoom){
         setAlertType(Bed.TYPE_DISCONNECTION);
         setChangeCount(0);
-        setFirstUseTime(Calendar.getInstance().getTimeInMillis());
-        setLastChangeTime(Calendar.getInstance().getTimeInMillis());
+        setFirstUseTime(-1);
+        setLastChangeTime(-1);
+        setEnCountTime(-1);
         setIndex(index);
         setName(getIndex() + "번침대");
         setPooCount(0);
@@ -112,6 +112,14 @@ public class Bed {
         this.degree = degree;
     }
 
+    public long getEnCountTime() {
+        return enCountTime;
+    }
+
+    public void setEnCountTime(long enCountTime) {
+        this.enCountTime = enCountTime;
+    }
+
     public String getTypeToString(int type){
         String value = "";
         switch (type){
@@ -163,13 +171,17 @@ public class Bed {
         }
         Bed bed = (Bed) obj;
 
-        return name.equals(bed.getName()) &&
+        return java.util.Objects.equals(name, bed.getName()) &&
+                departRoom == bed.getDepartRoom() &&
                 index == bed.getIndex() &&
                 firstUseTime == bed.getFirstUseTime() &&
                 lastChangeTime == bed.getLastChangeTime() &&
+                enCountTime == bed.getEnCountTime() &&
                 pooCount == bed.getPooCount() &&
                 changeCount == bed.getChangeCount() &&
-                alertType == bed.getAlertType();
+                alertType == bed.getAlertType() &&
+                Float.compare(bed.getDegree(), degree) == 0 &&
+                isAttach == bed.isAttach();
     }
 
     public int getDepartRoom() {

@@ -6,15 +6,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import nwc.hardware.bletool.BluetoothPermissionTool;
 import nwc.hardware.smartpottypad.R;
@@ -28,6 +30,9 @@ import nwc.hardware.smartpottypad.tasks.SetPreferences;
 public class IntroActivity extends AppCompatActivity {
     private final String TAG = "IntroActivity";
     private static final int IGNORE_BATTERY_OPTIMIZATION_REQUEST = 1001;
+    private boolean doubleBackToExitPressedOnce = false;
+    private static final int DOUBLE_BACK_TO_EXIT_INTERVAL = 2000;
+
 
     public final static int FRAGMENT_INTRO = 0;
     public final static int FRAGMENT_REGISTER = 1;
@@ -157,9 +162,22 @@ public class IntroActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK){
-            if(onBackKeyDownListener != null){
-                onBackKeyDownListener.onBackKeyDown();
+            if (doubleBackToExitPressedOnce) {
+                // 두 번째 클릭 간격이 2초 이내인 경우 앱을 종료합니다.
+                super.onBackPressed();
+                return true;
             }
+
+            doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "한번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    doubleBackToExitPressedOnce = false;
+                }
+            }, DOUBLE_BACK_TO_EXIT_INTERVAL);
+            return true;
         }
         return false;
     }

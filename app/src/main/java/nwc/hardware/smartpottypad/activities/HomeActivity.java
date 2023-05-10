@@ -1,23 +1,19 @@
 package nwc.hardware.smartpottypad.activities;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import nwc.hardware.smartpottypad.R;
-import nwc.hardware.smartpottypad.datas.Bed;
 import nwc.hardware.smartpottypad.datas.DeviceProfile;
 import nwc.hardware.smartpottypad.datas.User;
 import nwc.hardware.smartpottypad.fragments.home.HomeFragment;
@@ -30,6 +26,8 @@ import nwc.hardware.smartpottypad.tasks.SetPreferences;
 
 public class HomeActivity extends AppCompatActivity {
     private final String TAG = "HomeActivity";
+    private boolean doubleBackToExitPressedOnce = false;
+    private static final int DOUBLE_BACK_TO_EXIT_INTERVAL = 2000;
 
     public final static int FRAGMENT_SETTING= 0;
     public final static int FRAGMENT_INFO = 1;
@@ -50,6 +48,8 @@ public class HomeActivity extends AppCompatActivity {
     private User info;
     private DeviceProfile profile = new DeviceProfile();
 
+    private int nowFragmentIndex = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,14 +66,19 @@ public class HomeActivity extends AppCompatActivity {
 
     public void changeFragment(int idx){
         if(idx == FRAGMENT_SETTING){
+            nowFragmentIndex = idx;
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.fade_in, R.anim.fade_out).replace(R.id.homeFrame, settingFragment).commitAllowingStateLoss();
         }else if(idx == FRAGMENT_INFO){
+            nowFragmentIndex = idx;
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.fade_in, R.anim.fade_out).replace(R.id.homeFrame, homeFragment).commitAllowingStateLoss();
         }else if(idx == FRAGMENT_DETAIL_WIFI){
+            nowFragmentIndex = idx;
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.fade_in, R.anim.fade_out).replace(R.id.HomeDetailFrame, home_checkWifiFragment).commitAllowingStateLoss();
         }else if(idx == FRAGMENT_DETAIL_SCAN_WIFI){
+            nowFragmentIndex = idx;
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.fade_in, R.anim.fade_out).replace(R.id.HomeDetailFrame, searchingWifiFragment).commitAllowingStateLoss();
         }else if(idx == FRAGMENT_DETAIL_SCAN_BLUETOOTH){
+            nowFragmentIndex = idx;
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.fade_in, R.anim.fade_out).replace(R.id.HomeDetailFrame, searchingBluetoothFragment).commitAllowingStateLoss();
         }
     }
@@ -81,9 +86,27 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK){
-            if(onBackKeyDownListener != null){
-                onBackKeyDownListener.onBackKeyDown();
+            if(nowFragmentIndex == FRAGMENT_INFO){
+                if(homeFragment.closeSettingFrameVisible()){
+                    return false;
+                }
             }
+            if (doubleBackToExitPressedOnce) {
+                // 두 번째 클릭 간격이 2초 이내인 경우 앱을 종료합니다.
+                super.onBackPressed();
+                return true;
+            }
+
+            doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "한번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    doubleBackToExitPressedOnce = false;
+                }
+            }, DOUBLE_BACK_TO_EXIT_INTERVAL);
+            return true;
         }
         return false;
     }
@@ -106,65 +129,5 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setProfile(DeviceProfile profile) {
         this.profile = profile;
-    }
-
-    public void addAttachReference(){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users")
-                .child(profile.getUserkey())
-                .child("rooms")
-                .child(profile.getRoomindex())
-                .child("beds")
-                .child(profile.getBedindex());
-
-        ValueEventListener degreelistener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG, "Degree Changed!");
-                double degree = (double) snapshot.getValue();
-
-                Bed bed = info.getRooms().get(Integer.parseInt(profile.getRoomindex()))
-                        .getBeds().get(Integer.parseInt(profile.getBedindex()));
-                bed.setDegree((float)degree);
-
-                if(bed.getAlertType() == Bed.TYPE_DISCONNECTION){
-                    bed.setAlertType(Bed.TYPE_NORMAL);
-                    reference.setValue(bed);
-                    homeFragment.repaintAdapter();
-                }else if(bed.getAlertType() == Bed.TYPE_NORMAL){
-                    Log.d(TAG, "Degree is NORMAL!");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-        reference.child("attach").setValue(true);
-        ValueEventListener attachlistener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG, "Attach Changed!");
-                boolean isAttach = (boolean)snapshot.getValue();
-                Bed bed = info.getRooms().get(Integer.parseInt(profile.getRoomindex()))
-                        .getBeds().get(Integer.parseInt(profile.getBedindex()));
-                bed.setAttach(isAttach);
-                if(!isAttach){
-                    reference.child("degree").removeEventListener(degreeAttaches.get(reference));
-                    reference.child("attach").removeEventListener(Attaches.get(reference));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-
-        reference.child("degree").addValueEventListener(degreelistener);
-        reference.child("attach").addValueEventListener(attachlistener);
-
-        degreeAttaches.put(reference, degreelistener);
-        Attaches.put(reference, attachlistener);
     }
 }

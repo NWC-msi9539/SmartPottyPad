@@ -23,7 +23,6 @@ import nwc.hardware.smartpottypad.tasks.SetPreferences;
 
 public class UpdateService extends Service {
     private DatabaseReference infos = FirebaseDatabase.getInstance().getReference("users").child(SetPreferences.databaseKey);
-    private DatabaseReference dataBaseRooms = FirebaseDatabase.getInstance().getReference("users").child(SetPreferences.databaseKey).child("rooms");
 
     private Timer timer;
     private TimerTask timerTask;
@@ -59,7 +58,7 @@ public class UpdateService extends Service {
             List<Bed> beds = new ArrayList<>();
             List<Bed> Originbeds = r.getBeds();
 
-            for(Bed b : Originbeds){
+            for(Bed b : Originbeds) {
                 beds.add(b);
             }
 

@@ -16,7 +16,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -26,6 +25,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
@@ -135,7 +136,6 @@ public class SettingFragment extends Fragment {
                         if(b.isAttach()){
                             parent.getProfile().setRoomindex("" + roomcnt);
                             parent.getProfile().setBedindex("" + bedcnt);
-                            parent.addAttachReference();
                         }
                         bedcnt++;
                     }

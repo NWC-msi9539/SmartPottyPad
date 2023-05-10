@@ -304,7 +304,6 @@ public class SearchingBluetoothFragment extends Fragment {
                                 if(!String.format("%.1f", Origindegree).equals(String.format("%.1f", degree))){
                                     cnt = 0;
                                     statusText.setText("서버와 연결 되었습니다.");
-                                    parent.addAttachReference();
                                     connectTimer.cancel();
                                     connectTimer = null;
                                     HomeDetailFrame.animate()
